@@ -44,7 +44,7 @@ export default function Home({ messages }) {
         });
         const data = await response.json();
         console.log(data);
-        router.reload();
+        router.push("/");
         setLoading(false);
     };
 
@@ -58,7 +58,7 @@ export default function Home({ messages }) {
         });
         const data = await response.json();
         console.log(data);
-        router.reload();
+        router.push("/");
         setLoading(false);
     };
 
@@ -72,7 +72,7 @@ export default function Home({ messages }) {
         });
         const data = await response.json();
         console.log(data);
-        router.reload();
+        router.push("/");
         setLoading(false);
     };
 
@@ -236,7 +236,7 @@ export default function Home({ messages }) {
     );
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
     const { db } = await connectDB();
     const collection = db.collection("messages");
     const messages = await collection.find().toArray();
