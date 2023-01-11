@@ -44,7 +44,7 @@ export default function Home({ messages }) {
         });
         const data = await response.json();
         console.log(data);
-        router.push("/");
+        router.reload();
         setLoading(false);
     };
 
@@ -58,7 +58,7 @@ export default function Home({ messages }) {
         });
         const data = await response.json();
         console.log(data);
-        router.push("/");
+        router.reload();
         setLoading(false);
     };
 
