@@ -72,16 +72,21 @@ export default function Home({ messages }) {
         });
         const data = await response.json();
         console.log(data);
-        router.push("/");
+        router.reload();
         setLoading(false);
     };
 
     return (
         <div className="w-full h-[100vh] flex flex-col my-4 justify-center items-center">
             <div className="h-10 text-white w-full flex justify-center items-center">
-                <h1 className="text-[1.5rem] sm:text-4xl font-bold">Crud App</h1>
+                <h1 className="text-[1.5rem] sm:text-4xl font-bold">
+                    Crud App
+                </h1>
             </div>
-            <p className="text-[#E50194] text-sm text-center sm:text-base md:text-lg">A create-read-update-delete app where you can made changes to the database through the UI!</p>
+            <p className="text-[#E50194] text-sm text-center sm:text-base md:text-lg">
+                A create-read-update-delete app where you can made changes to
+                the database through the UI!
+            </p>
             <div className="bg-white w-[90%] md:w-[80%] lg:w-[75%] xl:w-[70%] p-4 mt-3 rounded-md flex flex-col items-center justify-around">
                 <p className="text-black w-full text-center px-3 py-1 rounded-sm text-sm md:text-base bg-gray-200">
                     Messages
@@ -100,7 +105,11 @@ export default function Home({ messages }) {
                         {messages.map((message) => (
                             <tr key={message.id}>
                                 <td>{message.no}</td>
-                                <td>{message.text}</td>
+                                <td>
+                                    {message.text.length > 10
+                                        ? `${message.text.slice(0, 9)}...`
+                                        : message.text}
+                                </td>
                                 <td>
                                     {width < 640
                                         ? `${message.id.slice(0, 3)}...`
