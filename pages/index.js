@@ -236,7 +236,7 @@ export default function Home({ messages }) {
     );
 }
 
-export const getServerSideProps = async () => {
+export const getStaticProps = async () => {
     const { db } = await connectDB();
     const collection = db.collection("messages");
     const messages = await collection.find().toArray();
