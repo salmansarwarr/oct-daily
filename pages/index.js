@@ -1,31 +1,45 @@
 //REACT-ICONS
-import { MdModeEditOutline } from "react-icons/md";
-import { AiFillDelete } from "react-icons/ai";
+import { MdModeEditOutline } from 'react-icons/md';
+import { AiFillDelete } from 'react-icons/ai';
 //UTILS
-import connectDB from "../utils/connectDB";
+import db from '../utils/connectDB';
+//NEXT-CONNECT
+import nc from 'next-connect';
 //REACTJS
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 //NEXTJS
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 // MATERIAL UI
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import { CircularProgress } from "@mui/material";
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import { CircularProgress } from '@mui/material';
 
 const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    bgcolor: "background.paper",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    bgcolor: 'background.paper',
     boxShadow: 24,
+};
+
+const getMessages = async () => {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM messages', (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
 };
 
 export default function Home({ messages }) {
     const router = useRouter();
     const [width, setWidth] = useState(0);
     const [editState, setEditState] = useState(false);
-    const [messageText, setMessageText] = useState("");
+    const [messageText, setMessageText] = useState('');
     const [selectedId, setSelectedId] = useState(0);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -35,44 +49,44 @@ export default function Home({ messages }) {
     }, []);
 
     const addMessageHandler = async (enteredMessage) => {
-        const response = await fetch("/api/new-message", {
-            method: "POST",
+        const response = await fetch('/api/new-message', {
+            method: 'POST',
             body: JSON.stringify(enteredMessage),
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
         });
         const data = await response.json();
         console.log(data);
-        router.push("/");
+        router.push('/');
         setLoading(false);
     };
 
     const editMessageHandler = async (enteredMessage) => {
-        const response = await fetch("/api/edit-message", {
-            method: "POST",
+        const response = await fetch('/api/edit-message', {
+            method: 'POST',
             body: JSON.stringify(enteredMessage),
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
         });
         const data = await response.json();
         console.log(data);
-        router.push("/");
+        router.push('/');
         setLoading(false);
     };
 
     const deleteMessageHandler = async (id) => {
-        const response = await fetch("/api/delete-message", {
-            method: "POST",
+        const response = await fetch('/api/delete-message', {
+            method: 'POST',
             body: JSON.stringify(id),
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
         });
         const data = await response.json();
         console.log(data);
-        router.push("/");
+        router.push('/');
         setLoading(false);
     };
 
@@ -80,7 +94,7 @@ export default function Home({ messages }) {
         <div className="w-full h-[100vh] flex flex-col my-4 justify-center items-center">
             <div className="h-10 text-white w-full flex justify-center items-center">
                 <h1 className="text-[1.5rem] sm:text-4xl font-bold">
-                    Crud App
+                    Crud App (MySql)
                 </h1>
             </div>
             <p className="text-[#E50194] text-sm text-center sm:text-base md:text-lg">
@@ -118,8 +132,8 @@ export default function Home({ messages }) {
                                 <td>
                                     <MdModeEditOutline
                                         style={{
-                                            margin: "auto",
-                                            cursor: "pointer",
+                                            margin: 'auto',
+                                            cursor: 'pointer',
                                         }}
                                         onClick={() => {
                                             setMessageText(message.text);
@@ -131,8 +145,8 @@ export default function Home({ messages }) {
                                 <td>
                                     <AiFillDelete
                                         style={{
-                                            margin: "auto",
-                                            cursor: "pointer",
+                                            margin: 'auto',
+                                            cursor: 'pointer',
                                         }}
                                         onClick={() => {
                                             setOpen(true);
@@ -159,7 +173,7 @@ export default function Home({ messages }) {
                                     deleteMessageHandler(selectedId);
                                     setOpen(false);
                                     setEditState(false);
-                                    setMessageText("");
+                                    setMessageText('');
                                 }}
                                 className="bg-[#E50914] text-white text-sm py-1 px-3 rounded-md ml-1 hover:bg-[#cf0b14]"
                             >
@@ -210,20 +224,20 @@ export default function Home({ messages }) {
                             editState
                                 ? editMessageHandler(newMessage)
                                 : addMessageHandler(newMessage);
-                            setMessageText("");
+                            setMessageText('');
                             setEditState(false);
                         }}
                         className="bg-gray-700 text-white text-sm py-1 w-full sm:w-[10rem] rounded-md hover:bg-gray-800 px-1"
                     >
                         {editState
-                            ? "Edit selected message"
-                            : "Create new message"}
+                            ? 'Edit selected message'
+                            : 'Create new message'}
                     </button>
                     {editState && (
                         <button
                             onClick={() => {
                                 setEditState(false);
-                                setMessageText("");
+                                setMessageText('');
                             }}
                             className="bg-[#E50914] text-white mt-1 text-sm py-1 w-full sm:w-[10rem] rounded-md sm:ml-1 hover:bg-[#cf0b14]"
                         >
@@ -237,14 +251,12 @@ export default function Home({ messages }) {
 }
 
 export const getServerSideProps = async () => {
-    const { db } = await connectDB();
-    const collection = db.collection("messages");
-    const messages = await collection.find().toArray();
+    const messages = await getMessages();
 
     return {
         props: {
             messages: messages.map((message) => ({
-                id: message._id.toString(),
+                id: message.id.toString(),
                 no: message.no,
                 text: message.text,
             })),

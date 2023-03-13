@@ -1,17 +1,23 @@
 //  /api/new-message
 
 //UTILS
-import connectDB from '../../utils/connectDB';
+import db from '../../utils/connectDB';
 
 const handler = async (req, res) => {
+    const {no, text} = req.body;
     if(req.method == 'POST') {
-        const data = req.body;
-        const {client, db} = await connectDB();
-        const collection = db.collection("messages");
-        const result = await collection.insertOne(data);
-        client.close();
-        console.log(result);
-        res.status(201).json({message: 'message inserted'})
+        try {
+            const query = `INSERT INTO messages VALUES (${no}, '${text}', ${no})`
+            db.query(query, (error, result) => {
+                if(error) {
+                    throw error
+                } else {
+                    res.send({status: 'success', result});
+                }
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 

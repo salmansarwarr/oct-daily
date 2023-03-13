@@ -1,18 +1,23 @@
 //  /api/edit-message
 
 //UTILS
-import { ObjectId } from 'mongodb';
-import connectDB from '../../utils/connectDB';
+import db from '../../utils/connectDB';
 
-const handler = async (req, res) => {
+const handler = async (req, res) => {   
+    const {id, text} = req.body;
     if(req.method == 'POST') {
-        const data = req.body;
-        const {client, db} = await connectDB();
-        const collection = db.collection("messages");
-        const result = await collection.updateOne({_id: ObjectId(data.id)}, {$set: data});
-        client.close();
-        console.log(result);
-        res.status(201).json({message: 'message updated'})
+        try {
+            const query = `UPDATE messages SET text = '${text}' WHERE id = ${id};`
+            db.query(query, (error, result) => {
+                if(error) {
+                    throw error
+                } else {
+                    res.send({status: 'success', result});
+                }
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 
