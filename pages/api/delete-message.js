@@ -1,13 +1,14 @@
 //  /api/delete-message
 
-//UTILS
 import db from '../../utils/connectDB';
 
 const handler = async (req, res) => {
     if(req.method == 'POST') {
         try {
-            console.log(req.body);
+            // Construct the SQL query to delete the message with the given id
             const query = `DELETE FROM messages WHERE id = ${req.body};`
+
+            // Execute the query
             db.query(query, (error, result) => {
                 if(error) {
                     throw error

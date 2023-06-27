@@ -1,31 +1,32 @@
-//REACT-ICONS
-import { MdModeEditOutline } from 'react-icons/md';
-import { AiFillDelete } from 'react-icons/ai';
-//UTILS
-import db from '../utils/connectDB';
-//NEXT-CONNECT
-import nc from 'next-connect';
-//REACTJS
-import { useEffect, useState } from 'react';
-//NEXTJS
-import { useRouter } from 'next/router';
+// REACT-ICONS
+import { MdModeEditOutline } from "react-icons/md";
+import { AiFillDelete } from "react-icons/ai";
+// UTILS
+import db from "../utils/connectDB";
+// REACTJS
+import { useEffect, useState } from "react";
+// NEXTJS
+import { useRouter } from "next/router";
 // MATERIAL UI
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import { CircularProgress } from '@mui/material';
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import { CircularProgress } from "@mui/material";
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    bgcolor: 'background.paper',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    bgcolor: "background.paper",
     boxShadow: 24,
 };
 
+// Function to retrieve messages from the database
 const getMessages = async () => {
     return new Promise((resolve, reject) => {
-        db.query('SELECT * FROM messages', (error, results) => {
+        let sql = "SELECT * FROM messages";
+
+        db.query(sql, (error, results) => {
             if (error) {
                 reject(error);
             } else {
@@ -35,72 +36,126 @@ const getMessages = async () => {
     });
 };
 
-export default function Home({ messages }) {
+const Home = ({ messages }) => {
     const router = useRouter();
     const [width, setWidth] = useState(0);
     const [editState, setEditState] = useState(false);
-    const [messageText, setMessageText] = useState('');
+    const [messageText, setMessageText] = useState("");
     const [selectedId, setSelectedId] = useState(0);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    const [sortOrder, setSortOrder] = useState("");
+
+    // Filter the messages based on the search text
+    const filteredMessages = messages.filter((message) =>
+        message.text.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    // Sort the filtered messages based on the selected sort order
+    const sortedMessages = filteredMessages.sort((a, b) => {
+        if (sortOrder === "asc") {
+            return a.id - b.id;
+        } else if (sortOrder === "desc") {
+            return b.id - a.id;
+        }
+    });
 
     useEffect(() => {
         setWidth(window.innerWidth);
     }, []);
 
+    const handleSearch = (event) => {
+        setSearchText(event.target.value);
+    };
+
+    const handleSortOrder = (event) => {
+        setSortOrder(event.target.value);
+    };
+
+    // Function to add a new message to the database
     const addMessageHandler = async (enteredMessage) => {
-        const response = await fetch('/api/new-message', {
-            method: 'POST',
+        const response = await fetch("/api/new-message", {
+            method: "POST",
             body: JSON.stringify(enteredMessage),
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
         });
         const data = await response.json();
         console.log(data);
-        router.push('/');
+        router.push("/");
         setLoading(false);
     };
 
+    // Function to edit an existing message in the database
     const editMessageHandler = async (enteredMessage) => {
-        const response = await fetch('/api/edit-message', {
-            method: 'POST',
+        const response = await fetch("/api/edit-message", {
+            method: "POST",
             body: JSON.stringify(enteredMessage),
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
         });
         const data = await response.json();
         console.log(data);
-        router.push('/');
+        router.push("/");
         setLoading(false);
     };
 
+    // Function to delete a message from the database
     const deleteMessageHandler = async (id) => {
-        const response = await fetch('/api/delete-message', {
-            method: 'POST',
+        const response = await fetch("/api/delete-message", {
+            method: "POST",
             body: JSON.stringify(id),
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
         });
         const data = await response.json();
         console.log(data);
-        router.push('/');
+        router.push("/");
         setLoading(false);
     };
 
     return (
         <div className="w-full h-[100vh] flex flex-col my-4 justify-center items-center">
+            {/* Application heading */}
             <div className="h-10 text-white w-full flex justify-center items-center">
-                <h1 className="text-[1.5rem] sm:text-4xl font-bold">
-                    Crud App (MySql)
+                <h1 className="text-[1.5rem] sm:text-4xl text-center font-bold">
+                    Oct Daily Internship Program
                 </h1>
             </div>
-            <p className="text-[#E50194] text-sm text-center sm:text-base md:text-lg">
-                A create-read-update-delete app where you can made changes to
-                the database through the UI!
+            {/* Subheading */}
+            <p className="text-[#E50194] mt-3 text-sm text-center sm:text-base md:text-lg">
+                Crud app using nextjs and mysql
             </p>
+            {/* Search and sort options */}
+            <div className="flex flex-col gap-4 items-center justify-between mt-4">
+                <input
+                    type="text"
+                    placeholder="Search"
+                    value={searchText}
+                    onChange={handleSearch}
+                    className="w-[15rem] p-1 border border-gray-400 rounded-md"
+                />
+                <div>
+                    <label htmlFor="sort-order" className="text-white">
+                        Sort Order:
+                    </label>
+                    <select
+                        id="sort-order"
+                        value={sortOrder}
+                        onChange={handleSortOrder}
+                        className="ml-2 border border-gray-400 rounded-md"
+                    >
+                        <option value="">None</option>
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+            </div>
+            {/* Messages table */}
             <div className="bg-white w-[90%] md:w-[80%] lg:w-[75%] xl:w-[70%] p-4 mt-3 rounded-md flex flex-col items-center justify-around">
                 <p className="text-black w-full text-center px-3 py-1 rounded-sm text-sm md:text-base bg-gray-200">
                     Messages
@@ -116,11 +171,11 @@ export default function Home({ messages }) {
                         </tr>
                     </thead>
                     <tbody className="text-[0.8rem] text-gray-200  md:text-[0.94rem] w-full text-center">
-                        {messages.map((message) => (
+                        {sortedMessages.map((message) => (
                             <tr key={message.id}>
                                 <td>{message.no}</td>
                                 <td>
-                                    {message.text.length > 10
+                                    {message.text.length > 15
                                         ? `${message.text.slice(0, 9)}...`
                                         : message.text}
                                 </td>
@@ -132,8 +187,8 @@ export default function Home({ messages }) {
                                 <td>
                                     <MdModeEditOutline
                                         style={{
-                                            margin: 'auto',
-                                            cursor: 'pointer',
+                                            margin: "auto",
+                                            cursor: "pointer",
                                         }}
                                         onClick={() => {
                                             setMessageText(message.text);
@@ -145,8 +200,8 @@ export default function Home({ messages }) {
                                 <td>
                                     <AiFillDelete
                                         style={{
-                                            margin: 'auto',
-                                            cursor: 'pointer',
+                                            margin: "auto",
+                                            cursor: "pointer",
                                         }}
                                         onClick={() => {
                                             setOpen(true);
@@ -158,6 +213,7 @@ export default function Home({ messages }) {
                         ))}
                     </tbody>
                 </table>
+                {/* Modal for delete confirmation */}
                 <Modal
                     open={open}
                     onClose={() => setOpen(false)}
@@ -173,7 +229,7 @@ export default function Home({ messages }) {
                                     deleteMessageHandler(selectedId);
                                     setOpen(false);
                                     setEditState(false);
-                                    setMessageText('');
+                                    setMessageText("");
                                 }}
                                 className="bg-[#E50914] text-white text-sm py-1 px-3 rounded-md ml-1 hover:bg-[#cf0b14]"
                             >
@@ -188,6 +244,7 @@ export default function Home({ messages }) {
                         </div>
                     </Box>
                 </Modal>
+                {/* Loading indicator */}
                 {loading && (
                     <Modal open>
                         <div className="w-full flex justify-center h-full items-center">
@@ -195,6 +252,7 @@ export default function Home({ messages }) {
                         </div>
                     </Modal>
                 )}
+                {/* Textarea for message input */}
                 <textarea
                     type="text"
                     placeholder="Enter a message"
@@ -203,6 +261,7 @@ export default function Home({ messages }) {
                     className="w-full h-[5rem] border mt-3 align-top placeholder:text-sm p-1 text-sm focus:outline-gray-800 rounded border-gray-600"
                 />
                 <div className="mt-3">
+                    {/* Create/Edit message button */}
                     <button
                         onClick={(event) => {
                             event.preventDefault();
@@ -224,20 +283,21 @@ export default function Home({ messages }) {
                             editState
                                 ? editMessageHandler(newMessage)
                                 : addMessageHandler(newMessage);
-                            setMessageText('');
+                            setMessageText("");
                             setEditState(false);
                         }}
                         className="bg-gray-700 text-white text-sm py-1 w-full sm:w-[10rem] rounded-md hover:bg-gray-800 px-1"
                     >
                         {editState
-                            ? 'Edit selected message'
-                            : 'Create new message'}
+                            ? "Edit selected message"
+                            : "Create new message"}
                     </button>
+                    {/* Cancel editing button */}
                     {editState && (
                         <button
                             onClick={() => {
                                 setEditState(false);
-                                setMessageText('');
+                                setMessageText("");
                             }}
                             className="bg-[#E50914] text-white mt-1 text-sm py-1 w-full sm:w-[10rem] rounded-md sm:ml-1 hover:bg-[#cf0b14]"
                         >
@@ -251,7 +311,7 @@ export default function Home({ messages }) {
 }
 
 export const getServerSideProps = async () => {
-    const messages = await getMessages();
+    const messages = await getMessages("", "", "");
 
     return {
         props: {
@@ -263,3 +323,5 @@ export const getServerSideProps = async () => {
         },
     };
 };
+
+export default Home;
