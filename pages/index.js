@@ -36,6 +36,8 @@ const getMessages = async () => {
     });
 };
 
+const PAGE_SIZE = 5; // Number of messages to display per page
+
 const Home = ({ messages }) => {
     const router = useRouter();
     const [width, setWidth] = useState(0);
@@ -46,6 +48,7 @@ const Home = ({ messages }) => {
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [sortOrder, setSortOrder] = useState("");
+    const [currentPage, setCurrentPage] = useState(0);
 
     // Filter the messages based on the search text
     const filteredMessages = messages.filter((message) =>
@@ -60,6 +63,25 @@ const Home = ({ messages }) => {
             return b.id - a.id;
         }
     });
+
+    // Get the current page's messages based on the pagination
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    const displayedMessages = sortedMessages.slice(startIndex, endIndex);
+
+    const totalPages = Math.ceil(sortedMessages.length / PAGE_SIZE);
+
+    const handlePreviousPage = () => {
+        setCurrentPage((prevPage) => prevPage - 1);
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage((prevPage) => prevPage + 1);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
     useEffect(() => {
         setWidth(window.innerWidth);
@@ -163,27 +185,23 @@ const Home = ({ messages }) => {
                 <table className="bg-gray-800 w-full mt-3 rounded-sm">
                     <thead className="text-sm md:text-base text-white w-full border-b-white border-b-2">
                         <tr>
-                            <th>#</th>
+                            <th>id</th>
                             <th>Message</th>
-                            <th>Id</th>
                             <th>Edit</th>
                             <th>Remove</th>
                         </tr>
                     </thead>
                     <tbody className="text-[0.8rem] text-gray-200  md:text-[0.94rem] w-full text-center">
-                        {sortedMessages.map((message) => (
+                        {displayedMessages.map((message) => (
                             <tr key={message.id}>
-                                <td>{message.no}</td>
+                                <td>{message.id}</td>
                                 <td>
-                                    {message.text.length > 15
-                                        ? `${message.text.slice(0, 9)}...`
-                                        : message.text}
+                                    {/* {message.text.length > 15
+                                        ? `${message.text.slice(0, 20)}...`
+                                        : message.text} */}
+                                    {message.text}
                                 </td>
-                                <td>
-                                    {width < 640
-                                        ? `${message.id.slice(0, 3)}...`
-                                        : message.id}
-                                </td>
+
                                 <td>
                                     <MdModeEditOutline
                                         style={{
@@ -286,7 +304,7 @@ const Home = ({ messages }) => {
                             setMessageText("");
                             setEditState(false);
                         }}
-                        className="bg-gray-700 text-white text-sm py-1 w-full sm:w-[10rem] rounded-md hover:bg-gray-800 px-1"
+                        className="bg-[#E50194] text-white text-sm py-1 w-full sm:w-[10rem] rounded-md hover:bg-gray-800 px-1"
                     >
                         {editState
                             ? "Edit selected message"
@@ -305,10 +323,44 @@ const Home = ({ messages }) => {
                         </button>
                     )}
                 </div>
+                {/* Pagination controls */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center justify-center mt-8">
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 1}
+                            className="bg-gray-700 text-white text-sm py-1 px-3 rounded-md hover:bg-gray-800"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                            className="bg-gray-700 text-white text-sm py-1 px-3 rounded-md hover:bg-gray-800"
+                        >
+                            Next
+                        </button>
+                    </div>
+                    <div className="flex gap-1">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handlePageChange(index + 1)}
+                                className={`bg-gray-700 text-white text-sm py-1 px-3 rounded-md hover:bg-gray-800 ${
+                                    currentPage === index + 1
+                                        ? "bg-gray-800"
+                                        : ""
+                                }`}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export const getServerSideProps = async () => {
     const messages = await getMessages("", "", "");
