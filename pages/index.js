@@ -21,20 +21,7 @@ const style = {
     boxShadow: 24,
 };
 
-// Function to retrieve messages from the database
-const getMessages = async () => {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM messages";
 
-        db.query(sql, (error, results) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(results);
-            }
-        });
-    });
-};
 
 const PAGE_SIZE = 5; // Number of messages to display per page
 
@@ -363,6 +350,20 @@ const Home = ({ messages }) => {
 };
 
 export const getServerSideProps = async () => {
+    // Function to retrieve messages from the database
+const getMessages = async () => {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM messages";
+
+        db.query(sql, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
     const messages = await getMessages("", "", "");
 
     return {
