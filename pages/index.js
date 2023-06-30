@@ -48,7 +48,7 @@ const Home = ({ messages }) => {
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [sortOrder, setSortOrder] = useState("");
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Filter the messages based on the search text
     const filteredMessages = messages.filter((message) =>
