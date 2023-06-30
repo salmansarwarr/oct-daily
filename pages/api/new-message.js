@@ -1,6 +1,6 @@
 //  /api/new-message
 
-import db from './utils/connectDB';
+import db from './utils/_connectDB';
 
 const handler = async (req, res) => {
     const { no, text } = req.body;

@@ -2,7 +2,7 @@
 import { MdModeEditOutline } from "react-icons/md";
 import { AiFillDelete } from "react-icons/ai";
 // UTILS
-import db from "./api/utils/connectDB";
+import db from "./api/utils/_connectDB";
 // REACTJS
 import { useEffect, useState } from "react";
 // NEXTJS

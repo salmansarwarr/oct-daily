@@ -1,7 +1,7 @@
 //  /api/edit-message
 
 //UTILS
-import db from './utils/connectDB';
+import db from './utils/_connectDB';
 
 const handler = async (req, res) => {
     const { id, text } = req.body;
