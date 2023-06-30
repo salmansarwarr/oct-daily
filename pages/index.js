@@ -50,7 +50,7 @@ const Home = ({ messages }) => {
     const [sortOrder, setSortOrder] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Filter the messages based on the search text
+    // Filter the messages based on the search texto
     const filteredMessages = messages.filter((message) =>
         message.text.toLowerCase().includes(searchText.toLowerCase())
     );
