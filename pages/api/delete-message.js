@@ -1,6 +1,6 @@
 //  /api/delete-message
 
-import db from '../../utils/connectDB';
+import db from './utils/connectDB';
 
 const handler = async (req, res) => {
     if(req.method == 'POST') {
