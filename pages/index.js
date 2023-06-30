@@ -343,6 +343,7 @@ const Home = ({ messages }) => {
 };
 
 export const getServerSideProps = async () => {
+  
   // Function to retrieve messages from the database
   const getMessages = async () => {
     return new Promise((resolve, reject) => {
