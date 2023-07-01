@@ -144,7 +144,8 @@ const Home = ({ messages }) => {
           placeholder="Search"
           value={searchText}
           onChange={handleSearch}
-          className="w-[15rem] p-1 border border-gray-400 rounded-md"
+          disabled={messages.length === 0}
+          className="w-[15rem] p-1 px-2 border focus:outline-none border-gray-400 rounded-md"
         />
         <div>
           <label htmlFor="sort-order" className="text-white">
@@ -154,7 +155,8 @@ const Home = ({ messages }) => {
             id="sort-order"
             value={sortOrder}
             onChange={handleSortOrder}
-            className="ml-2 border border-gray-400 rounded-md"
+            disabled={messages.length === 0}
+            className="ml-2 border border-gray-400 rounded-md focus:outline-none"
           >
             <option value="">None</option>
             <option value="asc">Ascending</option>
@@ -266,6 +268,7 @@ const Home = ({ messages }) => {
         <div className="mt-3">
           {/* Create/Edit message button */}
           <button
+            disabled={messageText == ""}
             onClick={(event) => {
               event.preventDefault();
               setLoading(true);
@@ -288,7 +291,7 @@ const Home = ({ messages }) => {
               setMessageText("");
               setEditState(false);
             }}
-            className="bg-[#E50194] text-white text-sm py-1 w-full sm:w-[10rem] rounded-md hover:bg-gray-800 px-1"
+            className="bg-[#E50194] disabled:bg-[#700249] disabled:hover:bg-[#700249] text-white text-sm py-1 w-full sm:w-[10rem] rounded-md hover:bg-gray-800 px-1"
           >
             {editState ? "Edit selected message" : "Create new message"}
           </button>
@@ -343,7 +346,6 @@ const Home = ({ messages }) => {
 };
 
 export const getServerSideProps = async () => {
-  
   // Function to retrieve messages from the database
   const getMessages = async () => {
     return new Promise((resolve, reject) => {
@@ -358,7 +360,7 @@ export const getServerSideProps = async () => {
       });
     });
   };
-  
+
   const messages = await getMessages("", "", "");
 
   return {
